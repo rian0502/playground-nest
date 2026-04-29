@@ -1,14 +1,17 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
+  schemas = ["nest"]
 }
 
 enum Role {
   ADMIN
   CASHIER
+  @@schema("nest")
 }
 
 model User {
@@ -21,6 +24,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   transactions TransactionHeader[]
+  @@schema("nest")
 }
 
 model Product {
@@ -32,6 +36,7 @@ model Product {
   updatedAt DateTime @updatedAt
 
   details TransactionDetail[]
+  @@schema("nest")
 }
 
 model TransactionHeader {
@@ -46,6 +51,7 @@ model TransactionHeader {
   details TransactionDetail[]
 
   @@index([userId])
+  @@schema("nest")
 }
 
 model TransactionDetail {
@@ -60,4 +66,5 @@ model TransactionDetail {
 
   @@index([transactionId])
   @@index([productId])
+  @@schema("nest")
 }
