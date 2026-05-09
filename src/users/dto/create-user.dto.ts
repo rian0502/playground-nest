@@ -3,12 +3,12 @@ import { IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateUserDto {
     @IsNotEmpty()
-    name: string;
+    name!: string;
     @IsEmail()
-    email: string;
+    email!: string;
     @IsNotEmpty()
-    password: string;
+    password!: string;
     @IsNotEmpty()
     @IsEnum(Role)
-    role: Role;
+    role!: Role;
 }
