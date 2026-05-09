@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-// import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
@@ -31,6 +31,14 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         await this.cacheManager.set(cacheKey, user, 1000 * 60 * 60);
+        return user;
+    }
+
+    async create(createUserDto: CreateUserDto) {
+        const user = await this.prisma.user.create({
+            data: createUserDto,
+        });
+        await this.cacheManager.del(CacheKeys.users.list);
         return user;
     }
 }
