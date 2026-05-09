@@ -3,6 +3,7 @@ import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CacheKeys } from 'src/common/constants/cache-keys';
 
 @Controller('products')
 @UseInterceptors(CacheInterceptor)
@@ -15,7 +16,7 @@ export class ProductsController {
   }
 
   @Get()
-  @CacheKey('all_products_list')
+  @CacheKey(CacheKeys.products.list)
   @CacheTTL(1000 * 60 * 60)
   findAll() {
     return this.productsService.findAll();
