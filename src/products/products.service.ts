@@ -1,12 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
 import { CacheKeys } from 'src/common/constants/cache-keys';
-
-// import { Product } from '@prisma/client';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 
 @Injectable()
