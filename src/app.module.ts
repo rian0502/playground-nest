@@ -10,6 +10,7 @@ import KeyvRedis from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { KeyvCacheableMemory } from 'cacheable';
 import { AuthModule } from './auth/auth.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     UsersModule,
     ProductsModule,
-    AuthModule],
+    AuthModule,
+    TransactionsModule],
   controllers: [AppController],
   providers: [AppService],
 })
