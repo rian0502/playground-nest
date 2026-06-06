@@ -26,14 +26,38 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
         const payload = { sub: user.id, email: user.email, role: user.role };
+
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: '15m',
+        });
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            expiresIn: '7d',
+        });
+
         return {
-            access_token: await this.jwtService.signAsync(payload),
+            access_token: accessToken,
+            refresh_token: refreshToken,
             user: {
                 name: user.name,
                 role: user.role
             }
         };
     }
+
+    async refreshToken(token: string) {
+        try {
+            const payload = await this.jwtService.verifyAsync(token);
+
+            const newAccessToken = await this.jwtService.signAsync(
+                { sub: payload.sub, email: payload.email, role: payload.role },
+                { expiresIn: '15m' }
+            );
+            
+            return { access_token: newAccessToken };
+        } catch (error) { 
+            throw new UnauthorizedException('Refresh token is invalid or expired');
+        }
+     }
 
     async register(registerDto: RegisterDto) {
         const userExists = await this.prisma.user.findUnique({
