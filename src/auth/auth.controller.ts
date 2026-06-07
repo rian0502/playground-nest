@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Res, Req, UnauthorizedException } from '@nestjs/common';
-import type { Request, Response } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
+import { Throttle } from '@nestjs/throttler';
 import { RegisterDto } from './dto/register.dto';
+import type { Request, Response } from 'express';
+import { Controller, Post, Body, Res, Req, UnauthorizedException } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +14,7 @@ export class AuthController {
         return this.authService.register(registerDto);
     }
 
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
     @Post('login')
     async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
         const result = await this.authService.login(loginDto);
