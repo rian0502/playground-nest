@@ -1,17 +1,18 @@
+import { Keyv } from 'keyv';
+import KeyvRedis from '@keyv/redis';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
+import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { KeyvCacheableMemory } from 'cacheable';
+import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
+import { CacheModule } from '@nestjs/cache-manager';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
-import { Keyv } from 'keyv';
-import { KeyvCacheableMemory } from 'cacheable';
-import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TransactionsModule } from './transactions/transactions.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,12 +34,30 @@ import { TransactionsModule } from './transactions/transactions.module';
         ],
       }),
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ([
+        {
+          name: 'default',
+          ttl: configService.get<number>('THROTTLE_TTL') || 60000,
+          limit: configService.get<number>('THROTTLE_LIMIT') || 100,
+        }
+      ]),
+    }),
     PrismaModule,
     UsersModule,
     ProductsModule,
     AuthModule,
-    TransactionsModule],
+    TransactionsModule
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
 })
-export class AppModule {}
+export class AppModule { }
